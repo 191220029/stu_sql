@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    username: admin_online
+    password: 123
+    url: jdbc:mysql://172.24.25.250:3306/student?useUnicode=true&characterEncoding=utf8
+    #url: jdbc:mysql://192.168.3.14:3306/student?useUnicode=true&characterEncoding=utf8
+      #注：mybatis是数据库里确实存在的，否则出错
+    sql-script-encoding: UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver

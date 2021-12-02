@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+
+    <style>
+        .login{
+            background-color: #dddddd;
+            width:200px;
+            margin-top: 150px;
+            margin-left:auto;
+            margin-right:auto;
+            text-align: center;
+        }
+        .name{
+            margin-top:10px;
+        }
+        .password{
+            margin-bottom: 10px;
+        }
+        #confirm{
+            alignment: center;
+            background-color: aqua;
+            display: inline-block;
+            width: 50%;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        #confirm:hover{
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="login">
+        <a class="title">用户登陆</a><br>
+        <input class="input_box name" type="text" placeholder="请输入用户名"><br>
+        <input class="input_box password" type="password" placeholder="请输入密码"><br>
+        <a id="confirm" type="button">确定</a>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    $("#confirm").click(function () {
+        let username = $(".name").val();
+        let password = $(".password").val();
+        if(!username)
+            alert("用户名不能为空")
+        else if(!password)
+            alert("密码不能为空")
+        else {
+            /*let url = "/FindUsers/username=" + name + "&password=" + password;
+            $.get(url, function (data, status) {
+                if (data === "admin")
+                    window.location.replace("/student");
+                else if (data === "user")
+                    window.location.replace("/student");
+                else if (data === "password failed") {
+                    $(".password").val("");
+                    alert("密码错误");
+                } else {
+                    $(".name").val("");
+                    $(".password").val("");
+                    alert("用户名错误");
+
+                }
+            });*/
+            $.ajax({
+                type:'POST',
+                url: 'login',
+                data: {username, password},
+                //dataType: 'json',
+                success: function (data) {
+                    console.log("data:" + data);
+                    if (data === "admin")
+                        window.location.replace("/student");
+                    else if (data === "user")
+                        window.location.replace("/student");
+                    else if (data === "password failed") {
+                        $(".password").val("");
+                        alert("密码错误");
+                    } else {
+                        $(".name").val("");
+                        $(".password").val("");
+                        alert("用户名错误");
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        }
+    })
+</script>

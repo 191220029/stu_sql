@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="web/student.css">
+</head>
+<div>
+    <div class="edit_container">
+        <div class="search_container">查找<br>
+            <a class="searchById">按学号查找：<input placeholder="请输入学号" id="i_searchById"><a class="confirm" id="c_searchById">确认</a><br>
+            <a id="searchRes_id"></a></a>
+            <a class="searchByName">按姓名查找：<input placeholder="请输入姓名" id="i_searchByName"><a class="confirm" id="c_searchByName">确认</a><br>
+            <a id="searchRes_Name"></a></a>
+            <a class="searchByClass">按班级查找：<input placeholder="请输入年级" id="i_searchByClass_grade">
+                <input placeholder="请输入班级" id="i_searchByClass_class"><a class="confirm" id="c_searchByClass">确认</a><br>
+            <a id="searchRes_Class"></a></a>
+        </div>
+        <div class="add_container">添加<br>
+            <input placeholder="请输入学号" id="add_id">
+            <input placeholder="请输入姓名" id="add_name">
+            <input placeholder="请输入年级" id="add_grade">
+            <input placeholder="请输入班级" id="add_sclass">
+            <input placeholder="请输入性别" id="add_gender">
+            <input placeholder="请输入年龄" id="add_age">
+            <a class="confirm" id="add_confirm">确认</a>
+        </div><br>
+        <div class="modify_container">修改<br>
+            <a><input placeholder="请输入待修改项学号"><a class="confirm">查询</a></a><br>
+            <a>学号：<a></a> 姓名：<input> 年级：<input> 班级：<input> 性别：<input> 年龄：<input></a><br>
+            <a class="confirm">确认</a>
+        </div><br>
+        <div class="delete_container">删除<br>
+            <a><input placeholder="请输入学号"><a class="confirm">确认</a></a>
+        </div><br>
+    </div>
+    <div class="table_container"></div>
+    <div class="page_tool_container">
+        <a class="page_tool"><a>第</a><input id="page_num"><a>页</a></a>
+        <a class="page_tool"><a>每页</a><input id="page_eleNum"><a>项</a></a>
+    </div>
+    <div class="download_table_container">
+        <a class="donwnload_table" onclick="downloadExcel()">下载表格</a>
+        <a class="donwnload_page" onclick="downloadPage()">下载当前页的表格</a>
+    </div>
+</div>
+</body>
+</html>
+<script TYPE="text/javascript">
+
+    let pageI = 1;
+    let pageSize = 20;
+    let totalNum = 0;
+
+    $("#page_eleNum").val(pageSize);
+    $("#page_num").val(pageI)
+    GetStuTotalNum();
+    GetPage();
+
+    $("a.confirm").click(function (e) {
+        console.log(e.currentTarget.id)
+        if(e.currentTarget.id === "c_searchById"){
+            let id = $("#i_searchById").val();
+            //console.log(id)
+            if(!id)
+                alert("搜索内容不能为空")
+            else {
+                let url = "/searchById=" + id;
+                $.get(url, function (data, status) {
+                    //console.log(data)
+                    let html = "<a>学号：<a>" + data.id + "</a>  姓名：<a>"+ data.name
+                        + "</a>  年级：<a>"+ data.grade  + "</a>  班级：<a>"+ data.sclass
+                        + "</a>  性别：<a>"+ data.gender + "</a>  年龄：<a>"+ data.age + "</a></a><br>";
+                    //console.log(html);
+                    $("#searchRes_id").html(html);
+                })
+            }
+        }
+        else if(e.currentTarget.id === "c_searchByName"){
+            let name = $("#i_searchByName").val();
+            //console.log(name)
+            if(!name)
+                alert("搜索内容不能为空")
+            else {
+                let url = "/searchByName=" + name;
+                $.get(url, function (data, status) {
+                    //console.log(data);
+                    let html = "";
+                    data.forEach(u=>{
+                        //console.log(u);
+                        html += "<a>学号：<a>" + u.id + "</a>  姓名：<a>"+ u.name
+                            + "</a>  年级：<a>"+ u.grade  + "</a>  班级：<a>"+ u.sclass
+                            + "</a>  性别：<a>"+ u.gender + "</a>  年龄：<a>"+ u.age + "</a></a><br>";
+                    });
+
+                    //console.log(html);
+                    $("#searchRes_Name").html(html);
+
+                })
+            }
+
+        }
+        else if(e.currentTarget.id === "c_searchByClass") {
+            let grade = $("#i_searchByClass_grade").val();
+            let sclass = $("#i_searchByClass_class").val();
+            //console.log(name)
+            if (!grade || !sclass)
+                alert("年级和班级不能为空")
+            else {
+                let url = "/searchByGradeAndClass=grade="+grade+"&class="+sclass;
+                $.get(url, function (data, status) {
+                    console.log(data);
+                    let html = "";
+                    data.forEach(u => {
+                        //console.log(u);
+                        html += "<a>学号：<a>" + u.id + "</a>  姓名：<a>" + u.name
+                            + "</a>  年级：<a>" + u.grade + "</a>  班级：<a>" + u.sclass
+                            + "</a>  性别：<a>" + u.gender + "</a>  年龄：<a>" + u.age + "</a></a><br>";
+                    });
+
+                    //console.log(html);
+                    $("#searchRes_Class").html(html);
+
+                })
+            }
+        }
+        else if(e.currentTarget.id === "add_confirm"){
+            let id = $("#add_id").val();
+            let name = $("#add_name").val();
+            let grade = $("#add_grade").val();
+            let sclass = $("#add_sclass").val();
+            let gender = $("#add_gender").val();
+            let age = $("#add_age").val();
+            let url = "add=id="+id+"&name="+name+"&grade="+grade+"&class="+sclass+"&age="+age+"&gender="+gender;
+            //console.log(url);
+
+            $.get(url, function (data, status) {
+                console.log(data);
+                if(data){
+                    alert("添加成功");
+                    window.location.reload();
+                }
+            })
+        }
+    });
+
+
+    function GetStuTotalNum() {
+        $.get("stuTotalNum", function (data, status) {
+            totalNum = data;
+            //console.log(totalNum);
+        })
+    }
+
+    function getPageI() {
+        pageI = $("#page_num").val();
+    }
+    function getPageSize() {
+        pageSize = $("#page_eleNum").val();
+    }
+
+    function GetPage() {
+        getPageI();
+        getPageSize();
+        url = "getPage/startPage="+ (pageI - 1) + "&pSize=" + pageSize;
+        $.get(url, function (data, status) {
+            if(status==="success"){
+                //alert("数据: " + data + "\n状态: ");
+                let html = "<table class='student_table'>"
+                html += "<tr class='head'><th>学号</th><th>姓名</th><th>年级</th><th>班级</th><th>性别</th><th>年龄</th><th>编辑</th></tr>"
+                for (let i = 0; i < data.length; i++){
+                    //alert(data[i].name)
+                    html += "<tr class='content'><th class='id'>" + data[i].id + "</th>";
+                    html += "<th class='name'>" + data[i].name +  "</th>";
+                    html += "<th class='grade'>" +  data[i].grade +  "</th>";
+                    html += "<th class='sclass'>" +  data[i].sclass +  "</th>";
+                    html += "<th class='gender'>" +  data[i].gender  +  "</th>";
+                    html += "<th class='age'>" +  data[i].age  +  "</th>";
+                    html += "<th class='edit_container'><a id='modify' class='edit'>修改</a><a id='delete' class='edit'>删除</a></th></tr>"
+                }
+                html += "</table>";
+                //alert(html);
+                $(".table_container").html(html);
+                $(".table_container").css("padding-left", "30%")
+
+                $(".student_table").css("border-top", "1px solid #999");
+                $(".student_table").css("border-left", "1px solid #999");
+                $(".student_table").css("border-spacing", "0");
+                $(".head").css("font-weight", "bold")
+                $(".content").css("font-size", "13px")
+                $("th").css("border-right", "1px solid #999");
+                $("th").css("border-bottom", "1px solid #999");
+                $("th").css("padding", "10px 30px");
+                $(".id").css("background-color", "aqua");
+                $(".content:nth-child(2n)").css("background-color", "#dddddd")
+                $(".confirm").css("text-underline", "aquamarine");
+                $(".edit_container").css("background-color", "white");
+                $(".edit").css("color", "blue");
+                $(".edit").css("margin-right", "5px");
+                $(".edit").css("text-decoration", "underline");
+                $(".edit:hover").css("color", "red");
+
+                $("#modify").click(function (e) {
+                    //console.log(e);
+                    //console.log(e.currentTarget);
+                    console.log($(this).parent().parent());
+                    let parentEle = $(this).parent().parent();
+                    let childNodes = parentEle.children();
+                    console.log(childNodes);
+                    let id = childNodes[0].innerText;
+                    //console.log(id);
+                    let name = childNodes[1].innerText;
+                    let grade = childNodes[2].innerText;
+                    let sclass = childNodes[3].innerText;
+                    let gender = childNodes[4].innerText;
+                    let age = childNodes[5].innerText;
+
+                    //let html = parentEle.html();
+                    //console.log(html);
+
+                    let html = "<th class=\"id\" style=\"border-right: 1px solid rgb(153, 153, 153); border-bottom: 1px solid rgb(153, 153, 153); padding: 10px 30px; background-color: aqua;\">" +
+                        id +
+                        "</th><th class=\"name\" style=\"border-right: 1px solid rgb(153, 153, 153); border-bottom: 1px solid rgb(153, 153, 153); padding: 10px 30px;\"><input id='nameEdit' value='name' size='10'></th><th class=\"grade\" style=\"border-right: 1px solid rgb(153, 153, 153); border-bottom: 1px solid rgb(153, 153, 153); padding: 10px 30px;\">初二</th><th class=\"sclass\" style=\"border-right: 1px solid rgb(153, 153, 153); border-bottom: 1px solid rgb(153, 153, 153); padding: 10px 30px;\">1</th><th class=\"gender\" style=\"border-right: 1px solid rgb(153, 153, 153); border-bottom: 1px solid rgb(153, 153, 153); padding: 10px 30px;\">男</th><th class=\"age\" style=\"border-right: 1px solid rgb(153, 153, 153); border-bottom: 1px solid rgb(153, 153, 153); padding: 10px 30px;\">15</th><th class=\"edit_container\" style=\"border-right: 1px solid rgb(153, 153, 153); border-bottom: 1px solid rgb(153, 153, 153); padding: 10px 30px; background-color: white;\"><a id=\"modify\" class=\"edit\" style=\"color: blue; margin-right: 5px; text-decoration: underline;\">修改</a><a id=\"delete\" class=\"edit\" style=\"color: blue; margin-right: 5px; text-decoration: underline;\">删除</a></th>"
+                    parentEle.html(html);
+                })
+
+            }
+        })
+    }
+
+    $("#page_num").change(function (e) {
+        GetPage();
+    })
+    $("#page_eleNum").change(function (e) {
+        GetPage();
+    })
+
+
+
+    function downloadExcel() {
+        let url = "/genStuFile";
+        $.get(url, function (data, status) {
+            if(status==="success"){
+                if(data==="ok"){
+                    let a = document.createElement("a");
+                    a.href = '/home/file/StuFile.xlsx';
+                    a.click();
+                }
+            }
+        })
+    }
+    function downloadPage() {
+        let url = "/genStuPage/startPage=" + pageI + "&pSize=" + pageSize;
+        $.get(url, function (data, status) {
+            if(status==="success"){
+                if(data==="ok"){
+                    let a = document.createElement("a");
+                    a.href = '/home/file/StuFile.xlsx';
+                    a.click();
+                }
+            }
+        })
+    }
+</script>

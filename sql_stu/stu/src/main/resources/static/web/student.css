@@ -1,0 +1,33 @@
+.id{
+    background-color: aqua;
+}
+
+.confirm{
+    background-color: aqua;
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.confirm:hover{
+    background-color: red;
+}
+
+.page_tool_container{
+    margin-top: 10px;
+    text-align: center;
+    margin-left: 10px;
+}
+
+.page_tool_container input{
+    width: 30px;
+}
+
+.page_tool{
+    margin-right: 10px;
+}
+
+.download_table_container{
+    text-align: center;
+}
